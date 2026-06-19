@@ -1,0 +1,30 @@
+{
+  "name": "async-processing",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/aws-lambda": "^8.10.162",
+    "@types/node": "^26.0.0",
+    "eslint": "^10.5.0",
+    "globals": "^17.6.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1072.0",
+    "@aws-sdk/client-s3": "^3.1073.0",
+    "@aws-sdk/lib-dynamodb": "^3.1072.0",
+    "@aws-sdk/s3-request-presigner": "^3.1073.0",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,0 +1,67 @@
+org: arturceschin
+service: async-processing
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  architecture: arm64
+  region: sa-east-1
+  environment:
+    LIVES_TABLE: !Ref LivesTable
+    LIVES_IMAGE_BUCKET: !Ref LivesImagesBucket
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: dynamodb:PutItem
+          #We need to pass the ARN -> Amazon Resource Name
+          # And we don't need to copy and paste the arn from aws and paste it here
+          # For this we will use the !GetAtt which is to get the attribute and for that we need
+          # the logical name LivesTable. and inside there we have the Arn
+          Resource: !GetAtt LivesTable.Arn
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+          Resource: !Join ["/", [!GetAtt LivesImagesBucket.Arn, "*"]]
+
+package:
+  individually: true
+
+build:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: false
+    exclude:
+      - "@aws-sdk/*"
+
+functions:
+  createLive:
+    handler: src/functions/http/createLive.handler
+    events:
+      - httpApi:
+          path: /lives
+          method: POST
+
+resources:
+  Resources:
+    # This is not the table name but the resource name
+    LivesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        # Now this is the table name in dynamo
+        TableName: LivesTable
+        # Here is the Serverless pay type
+        BillingMode: PAY_PER_REQUEST
+        # We define the keys here
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S # means it is an string
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    LivesImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: youtube-async-processing-images

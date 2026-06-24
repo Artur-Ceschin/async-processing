@@ -29,14 +29,14 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
   const { number, title, fileName } = data;
   const { extension } = extractFileInfo(fileName);
-  const thumbnailKey = `${randomUUID()}.${extension}`;
+  const thumbnailKey = `uploads/${randomUUID()}.${extension}`;
 
-  const liveId = randomUUID();
+  const liveid = randomUUID();
 
   const putItemLiveItem = new PutCommand({
     TableName: env.LIVES_TABLE,
     Item: {
-      id: liveId,
+      id: liveid,
       number,
       title,
       thumbnailKey,
@@ -46,6 +46,9 @@ export async function handler(event: APIGatewayProxyEventV2) {
   const putObjectCommand = new PutObjectCommand({
     Bucket: env.LIVES_IMAGE_BUCKET,
     Key: thumbnailKey,
+    Metadata: {
+      key: liveid,
+    },
   });
 
   const uploadURL = await getSignedUrl(s3Client, putObjectCommand, {
@@ -55,5 +58,5 @@ export async function handler(event: APIGatewayProxyEventV2) {
   await dynamoClient.send(putItemLiveItem);
 
   //send the url to the client
-  return response(201, { liveId, uploadURL });
+  return response(201, { liveid, uploadURL });
 }

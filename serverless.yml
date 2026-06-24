@@ -13,7 +13,10 @@ provider:
     role:
       statements:
         - Effect: Allow
-          Action: dynamodb:PutItem
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+
           #We need to pass the ARN -> Amazon Resource Name
           # And we don't need to copy and paste the arn from aws and paste it here
           # For this we will use the !GetAtt which is to get the attribute and for that we need
@@ -35,6 +38,8 @@ build:
     sourcemap: false
     exclude:
       - "@aws-sdk/*"
+    external:
+      - sharp
 
 functions:
   createLive:
@@ -43,6 +48,16 @@ functions:
       - httpApi:
           path: /lives
           method: POST
+  processImage:
+    handler: src/functions/triggers/processImage.handler
+    events:
+      - s3:
+          bucket: !Ref LivesImagesBucket
+          event: s3:ObjectCreated:*
+          existing: true
+          forceDeploy: true
+          rules:
+            - prefix: uploads/
 
 resources:
   Resources:

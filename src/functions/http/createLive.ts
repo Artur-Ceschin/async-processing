@@ -47,7 +47,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
     Bucket: env.LIVES_IMAGE_BUCKET,
     Key: thumbnailKey,
     Metadata: {
-      key: liveid,
+      liveid,
     },
   });
 

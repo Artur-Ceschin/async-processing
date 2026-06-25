@@ -25,7 +25,7 @@ export async function handler(event: S3Event) {
         }),
       ]);
 
-      const liveId = metadata.liveId;
+      const liveId = metadata.liveid;
 
       if (!liveId) {
         return;
